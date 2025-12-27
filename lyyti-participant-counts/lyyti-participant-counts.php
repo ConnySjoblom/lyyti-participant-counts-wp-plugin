@@ -208,12 +208,10 @@ class Lyyti_Participant_Counts {
 			'status' => get_option('lyyti_default_status'),
 		), $atts);
 		if (empty($a['eid'])) {
-			// TODO: Error handling for cases where eid is undefined
-			return 'ERROR_LYYTI_EID_UNDEFINED';
+			return $this->handle_error('Event ID (eid) is not defined. Please set a default in Settings → Lyyti Options or specify it in the shortcode.');
 		}
 		if (empty($a['status'])) {
-			// TODO: Error handling for cases where status is undefined
-			return 'ERROR_LYYTI_STATUS_UNDEFINED';
+			return $this->handle_error('Participant status is not defined. Please set a default in Settings → Lyyti Options or specify it in the shortcode.');
 		}
 		return $this->lyyti_participant_count($a['eid'], $a['status']);
 	}
@@ -228,22 +226,27 @@ class Lyyti_Participant_Counts {
 		$public_key = get_option('lyyti_api_public_key');
 		$private_key = get_option('lyyti_api_private_key');
 		if (empty($public_key) || empty($private_key)) {
-			// TODO: Error handling for missing Lyyti API credentials
-			return 'ERROR_LYYTI_API_CREDENTIALS_MISSING';
+			return $this->handle_error('Lyyti API credentials are not configured. Please add them in Settings → Lyyti Options.');
 		}
 
 		$response = $this->lyyti_api_call($public_key, $private_key, "events/{$eid}/participants?status={$status}");
 		if (!isset($response['results_count'])) {
-			// TODO: Error handling for unexpected Lyyti API response
-			return 'ERROR_LYYTI_UNEXPECTED_API_RESPONSE';
+			return $this->handle_error('Unexpected response from Lyyti API. Please verify your API credentials and event ID.');
 		}
 
 		$participant_count = $response['results_count'];
 
-		$transient_expiration = get_option('lyyti_cache_lifetime', 600);
+		$transient_expiration = (int) get_option('lyyti_cache_lifetime', 600);
 		set_transient($transient_name, $participant_count, $transient_expiration);
 
 		return $participant_count;
+	}
+
+	private function handle_error($message) {
+		if (current_user_can('manage_options')) {
+			return '<span class="lyyti-error" style="color: #dc3232;">[Lyyti Error: ' . esc_html($message) . ']</span>';
+		}
+		return '';
 	}
 
 	// This function is stolen directly from the Lyyti API documentation
