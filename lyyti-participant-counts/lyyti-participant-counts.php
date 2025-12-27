@@ -127,7 +127,7 @@ class Lyyti_Participant_Counts {
 		add_settings_field(
 			'lyyti_api_private_key_settings_field',
 			'Private key',
-			function() use($that) { $that->settings_field_callback('lyyti_api_private_key'); },
+			function() use($that) { $that->settings_field_callback('lyyti_api_private_key', '', 'password'); },
 			'lyyti',
 			'lyyti_api_credentials_settings_section'
 		);
@@ -191,10 +191,10 @@ class Lyyti_Participant_Counts {
 
 	}
 
-	public function settings_field_callback($option_name, $description = '') {
+	public function settings_field_callback($option_name, $description = '', $type = 'text') {
 		$setting = get_option($option_name);
 		?>
-		<input type="text" name="<?php echo esc_attr($option_name); ?>" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
+		<input type="<?php echo esc_attr($type); ?>" name="<?php echo esc_attr($option_name); ?>" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
 		<?php
 		if (!empty($description)) {
 			?>
