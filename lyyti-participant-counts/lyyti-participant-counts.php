@@ -166,7 +166,7 @@ class Lyyti_Participant_Counts {
 		);
 
 		add_settings_field(
-			'lyyti_default_eid_settings_field',
+			'lyyti_cache_lifetime_settings_field',
 			'Cache lifetime',
 			function() use($that) {
 				$that->settings_field_callback(
