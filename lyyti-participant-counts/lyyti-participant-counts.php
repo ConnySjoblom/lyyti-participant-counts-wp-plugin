@@ -4,6 +4,7 @@
  * Plugin Name: Lyyti Participant Counts
  * Plugin URI: https://github.com/The-Sorce/lyyti-participant-counts-wp-plugin
  * Description: Exposes number of participants from Lyyti events in shortcodes using the Lyyti API.
+ * Version: 1.0.0
  * Author: Tony Karlsson
  * Author URI: https://github.com/The-Sorce
  */
