@@ -183,7 +183,7 @@ class Lyyti_Participant_Counts {
 	public function settings_field_callback($option_name, $description = '') {
 		$setting = get_option($option_name);
 		?>
-		<input type="text" name="<?php echo $option_name; ?>" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
+		<input type="text" name="<?php echo esc_attr($option_name); ?>" value="<?php echo isset( $setting ) ? esc_attr( $setting ) : ''; ?>">
 		<?php
 		if (!empty($description)) {
 			?>
