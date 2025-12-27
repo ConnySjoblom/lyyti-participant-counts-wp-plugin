@@ -236,7 +236,6 @@ class Lyyti_Participant_Counts {
 		return $participant_count;
 	}
 
-	// This function is stolen directly from the Lyyti API documentation
 	private function lyyti_api_call($public_key, $private_key, $call_string, $http_method = 'GET', $payload = null)
 	{
 		// Generate the signature based on the API keys
@@ -247,52 +246,33 @@ class Lyyti_Participant_Counts {
 			$private_key
 		);
 
-		// Set the required HTTP headers
-		$http_headers = array(
-			'Accept: application/json; charset=utf-8',
-			'Authorization: LYYTI-API-V2 public_key='.$public_key.', timestamp='.$timestamp.', signature='.$signature
+		// Set up the request arguments
+		$args = array(
+			'method'  => $http_method,
+			'headers' => array(
+				'Accept'        => 'application/json; charset=utf-8',
+				'Authorization' => 'LYYTI-API-V2 public_key='.$public_key.', timestamp='.$timestamp.', signature='.$signature,
+			),
 		);
 
-		// Initialize the cURL connection
-		$curl = curl_init('https://api.lyyti.com/v2/'.$call_string);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
-		// Handle HTTP method and payload
-		if ($http_method != 'GET' && isset($payload))
-		{
-			if ($http_method == 'PATCH')
-			{
-				$http_headers[] = 'Content-Type: application/merge-patch+json';
-			}
-			else
-			{
-				$http_headers[] = 'Content-Type: application/json; charset=utf-8';
-			}
-			if ($http_method == 'POST')
-			{
-				curl_setopt($curl, CURLOPT_POST, true);
-			}
-			else
-			{
-				curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $http_method);
-			}
-			curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload));
+		// Handle payload for non-GET requests
+		if ($http_method !== 'GET' && $payload !== null) {
+			$args['body'] = wp_json_encode($payload);
+			$args['headers']['Content-Type'] = ($http_method === 'PATCH')
+				? 'application/merge-patch+json'
+				: 'application/json; charset=utf-8';
 		}
 
-		// Set the HTTP headers and execute the call
-		curl_setopt($curl, CURLOPT_HTTPHEADER, $http_headers);
-		$result_json = curl_exec($curl);
+		// Make the request using WordPress HTTP API
+		$response = wp_remote_request('https://api.lyyti.com/v2/'.$call_string, $args);
 
 		// Check for errors
-		if ($curl_errno = curl_errno($curl))
-		{
-			return array('curl_error' => array('errno' => $curl_errno, 'message' => curl_strerror($curl_errno)));
+		if (is_wp_error($response)) {
+			return array('error' => $response->get_error_message());
 		}
-		curl_close($curl);
 
 		// Turn the resulting JSON into a PHP associative array and return it
-		$result_array = json_decode($result_json, $assoc = true);
-		return $result_array;
+		return json_decode(wp_remote_retrieve_body($response), true);
 	}
 }
 
