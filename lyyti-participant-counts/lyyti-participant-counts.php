@@ -88,11 +88,21 @@ class Lyyti_Participant_Counts {
 	}
 
 	public function settings_init() {
-		register_setting('lyyti', 'lyyti_api_public_key');
-		register_setting('lyyti', 'lyyti_api_private_key');
-		register_setting('lyyti', 'lyyti_default_eid');
-		register_setting('lyyti', 'lyyti_default_status');
-		register_setting('lyyti', 'lyyti_cache_lifetime');
+		register_setting('lyyti', 'lyyti_api_public_key', array(
+			'sanitize_callback' => 'sanitize_text_field',
+		));
+		register_setting('lyyti', 'lyyti_api_private_key', array(
+			'sanitize_callback' => 'sanitize_text_field',
+		));
+		register_setting('lyyti', 'lyyti_default_eid', array(
+			'sanitize_callback' => 'absint',
+		));
+		register_setting('lyyti', 'lyyti_default_status', array(
+			'sanitize_callback' => 'sanitize_text_field',
+		));
+		register_setting('lyyti', 'lyyti_cache_lifetime', array(
+			'sanitize_callback' => 'absint',
+		));
 
 		$that = $this; // Needed for the callbacks when adding the settings fields.
 
