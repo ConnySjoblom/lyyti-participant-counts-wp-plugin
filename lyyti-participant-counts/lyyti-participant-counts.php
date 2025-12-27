@@ -49,12 +49,8 @@ class Lyyti_Participant_Counts {
 	}
 
 	public function deactivation_hook_func() {
-		// Remove all options used by the plugin
-		delete_option('lyyti_api_public_key');
-		delete_option('lyyti_api_private_key');
-		delete_option('lyyti_default_eid');
-		delete_option('lyyti_default_status');
-		delete_option('lyyti_cache_lifetime');
+		// Data is preserved on deactivation in case the user reactivates.
+		// Full cleanup happens on uninstall (see uninstall.php).
 	}
 
 	public function options_page() {
